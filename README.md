@@ -12,15 +12,13 @@ This MCP server gives AI assistants (Claude, ChatGPT, etc.) direct access to the
 - Result Limits: Max 1024 rows, 50,000 characters
 - Autoscaling: see [autoscaling](#Autoscaling) section
 
-## Quick Start
+## Pre-Deployed Server
 
-### Use the Deployed Server
+**MCP Server URL**: `https://antm-hack-example.fastmcp.app/mcp`
 
-For easy setup in **OpenAI SDK**, **Codex CLI**, **Claude Desktop**, **Claude Code**, **Cursor**, or **Gemini CLI**, go to:
+**Quick Setup**: Visit https://antm-hack-example.fastmcp.app for easy integration with OpenAI SDK, Codex CLI, Claude Desktop, Claude Code, Cursor, or Gemini CLI.
 
-👉 **[fastmcp.cloud/app/antm-hack-example](https://fastmcp.cloud/app/antm-hack-example)**
-
-### Deploy Your Own Instance
+## Deploy Your Own Instance
 
 1. Create a [MotherDuck account](https://app.motherduck.com/)
 
