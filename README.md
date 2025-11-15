@@ -98,6 +98,4 @@ Get DuckDB SQL syntax guide.
 
 [FastMCP Cloud](https://fastmcp.cloud) autoscales and load balances traffic across multiple server instances based on demand. 
 
-Each server instance picks a random session hint on startup for load distribution. With [MotherDuck read scaling tokens](https://motherduck.com/docs/key-tasks/authenticating-and-connecting-to-motherduck/read-scaling/), this enables concurrent queries across multiple read-only replicas for improved performance. With regular tokens, the session hint is a harmless no-op.
-
-This architecture distributes load across both FastMCP instances and (optionally) MotherDuck read replicas.
+With [MotherDuck read scaling tokens](https://motherduck.com/docs/key-tasks/authenticating-and-connecting-to-motherduck/read-scaling/) concurrent queries are distributed across up to 16 read-only replicas.
