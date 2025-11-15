@@ -1,7 +1,5 @@
 # MotherDuck MCP Server on FastMCP Cloud
 
-FastMCP server for querying the ANTM hackathon dataset in MotherDuck with read scaling support.
-
 ## What is This?
 
 This MCP server gives AI assistants (Claude, ChatGPT, etc.) direct access to the [America's Next Top Modeler](https://github.com/TheoryVentures/antm) hackathon dataset via a remote MotherDuck MCP server, hosted on FastMCP Cloud.
