@@ -119,14 +119,6 @@ def build_application(
                 },
             ),
             types.Tool(
-                name="list_databases",
-                description="List all databases available in the MotherDuck account",
-                inputSchema={
-                    "type": "object",
-                    "properties": {},
-                },
-            ),
-            types.Tool(
                 name="show_tables",
                 description="Show all tables in a specific database",
                 inputSchema={
@@ -166,10 +158,6 @@ def build_application(
                         types.TextContent(type="text", text="Error: No query provided")
                     ]
                 tool_response = db_client.query(arguments["query"])
-                return [types.TextContent(type="text", text=str(tool_response))]
-            
-            if name == "list_databases":
-                tool_response = db_client.query("SHOW ALL DATABASES")
                 return [types.TextContent(type="text", text=str(tool_response))]
             
             if name == "show_tables":
