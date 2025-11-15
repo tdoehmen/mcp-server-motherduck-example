@@ -29,7 +29,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("motherduck_mcp")
 
 # Create FastMCP server
-mcp = FastMCP("MotherDuck", dependencies=["duckdb>=1.4.2", "tabulate>=0.9.0"])
+mcp = FastMCP("MotherDuck")
 
 # Single connection for this instance
 _conn: Optional[duckdb.DuckDBPyConnection] = None
@@ -162,18 +162,13 @@ def get_guide() -> str:
         return f"❌ Error reading guide: {str(e)}"
 
 
-# Initialize connection on startup
-@mcp.lifespan
-async def lifespan():
-    """Initialize resources on startup"""
-    initialize_connection()
-    logger.info("🚀 MotherDuck MCP Server ready!")
-    logger.info(f"📊 Configuration:")
-    logger.info(f"  • Database: {DB_PATH}")
-    logger.info(f"  • Read replicas: {READ_SCALING_REPLICAS}")
-    logger.info(f"  • Session hint: {_replica_id} (range: 1-{SESSION_HINT_RANGE})")
-    logger.info(f"  • Query timeout: {QUERY_TIMEOUT}s")
-    logger.info(f"  • Max rows: {MAX_ROWS}")
-    logger.info(f"  • Max chars: {MAX_CHARS:,}")
-    yield
-    logger.info("👋 Shutting down MotherDuck MCP Server")
+# Initialize connection on module load
+initialize_connection()
+logger.info("🚀 MotherDuck MCP Server ready!")
+logger.info(f"📊 Configuration:")
+logger.info(f"  • Database: {DB_PATH}")
+logger.info(f"  • Read replicas: {READ_SCALING_REPLICAS}")
+logger.info(f"  • Session hint: {_replica_id} (range: 1-{SESSION_HINT_RANGE})")
+logger.info(f"  • Query timeout: {QUERY_TIMEOUT}s")
+logger.info(f"  • Max rows: {MAX_ROWS}")
+logger.info(f"  • Max chars: {MAX_CHARS:,}")
