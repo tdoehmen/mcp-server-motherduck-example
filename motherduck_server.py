@@ -182,9 +182,6 @@ def create_server() -> FastMCP:
     logger.info(f"📊 Configuration:")
     logger.info(f"  • Database: {DATABASE_NAME}")
     logger.info(f"  • SaaS mode: Enabled")
-    logger.info(f"  • Read scaling: {'Enabled' if USE_READ_SCALING else 'Disabled'}")
-    if USE_READ_SCALING and _replica_id:
-        logger.info(f"  • Session hint: {_replica_id}")
     logger.info(f"  • Query timeout: {QUERY_TIMEOUT}s")
     logger.info(f"  • Max rows: {MAX_ROWS}")
     logger.info(f"  • Max chars: {MAX_CHARS:,}")
