@@ -13,7 +13,7 @@ This MCP server gives AI assistants (Claude, ChatGPT, etc.) direct access to the
 - **Show Tables Tool**: List all tables in the configured database  
 - **Get Guide Tool**: DuckDB SQL syntax reference and performance tips
 - **Read Only**: Connections established in [read-only mode](https://motherduck.com/docs/key-tasks/ai-and-motherduck/building-analytics-agents/#read-only-access) and in [SaaS mode](https://motherduck.com/docs/key-tasks/authenticating-and-connecting-to-motherduck/authenticating-to-motherduck/#authentication-using-saas-mode) to restrict local file/database access within the remote MCP server
-- **Autoscaling**: FastMCP Cloud and MotherDuck read scaling (see [Autoscaling](#autoscaling) section)
+- **Autoscaling**: FastMCP Cloud with support for MotherDuck read scaling tokens (see [Autoscaling](#autoscaling))
 - **Query Timeout**: 120 second timeout protection
 - **Result Limits**: Max 1024 rows, 50,000 characters
 
@@ -23,32 +23,35 @@ This MCP server gives AI assistants (Claude, ChatGPT, etc.) direct access to the
 
 ### Use the Deployed Server
 
-To connect Claude to the deployed MCP server:
+**MCP URL:** `https://antm-hack-example.fastmcp.app/mcp`
 
-1. Open **Claude Desktop** or **Claude.ai**
-2. Go to **Settings → Connectors → Add custom connector**
-3. Configure:
-   - **Name:** `ANTM Hack MotherDuck`
-   - **URL:** `https://antm-hack-example.fastmcp.app/mcp`
-4. Start querying the hackathon dataset!
+For easy setup in **OpenAI SDK**, **Codex CLI**, **Claude Desktop**, **Claude Code**, **Cursor**, or **Gemini CLI**, go to:
+
+👉 **[fastmcp.cloud/app/antm-hack-example](https://fastmcp.cloud/app/antm-hack-example)**
 
 ### Deploy Your Own Instance
 
-1. **Push to GitHub** (if not already done)
+1. **Create a [MotherDuck account](https://app.motherduck.com/)**
 
-2. **Go to [FastMCP Cloud](https://fastmcp.cloud)**
+2. **Create a [MotherDuck token](https://motherduck.com/docs/key-tasks/authenticating-and-connecting-to-motherduck/authenticating-to-motherduck/#creating-an-access-token)**
+   - Use a **read scaling token** for best performance with multiple concurrent users
 
-3. **Connect your repository**
+3. **Fork this repo** (if not already done)
 
-4. **Set environment variable**:
+4. **Go to [FastMCP Cloud](https://fastmcp.cloud)**
+
+5. **Connect your repository**
+
+6. **Set environment variable**:
    ```
-   MOTHERDUCK_TOKEN=<your_read_scaling_token>
+   MOTHERDUCK_TOKEN=<your_token>
    ```
-   (Read scaling is enabled by default)
 
-5. **Deploy!**
+7. **Configure deployment settings**:
+   - **Entrypoint:** `motherduck_server.py`
+   - **Requirements File:** `requirements.txt`
 
-[FastMCP Cloud](https://fastmcp.cloud) will auto-detect `motherduck_server.py` and deploy it.
+8. **Deploy!**
 
 ### Test Locally
 
@@ -57,9 +60,9 @@ To connect Claude to the deployed MCP server:
 pip install -r requirements.txt
 
 # Set environment variable
-export MOTHERDUCK_TOKEN="your_read_scaling_token_here"
+export MOTHERDUCK_TOKEN="your_token_here"
 
-# Run the server (read scaling enabled by default)
+# Run the server
 fastmcp run motherduck_server.py
 ```
 
@@ -69,9 +72,8 @@ fastmcp run motherduck_server.py
 
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
-| `MOTHERDUCK_TOKEN` | ✅ Yes | - | Your MotherDuck token (use read scaling token) |
+| `MOTHERDUCK_TOKEN` | ✅ Yes | - | Your MotherDuck token (regular or read scaling) |
 | `DATABASE_NAME` | No | antm_hack | Name of the MotherDuck database to connect to |
-| `USE_READ_SCALING` | No | true | Set to `false` to disable read scaling and use regular MotherDuck token |
 | `MAX_ROWS` | No | 1024 | Maximum rows in query results |
 | `MAX_CHARS` | No | 50000 | Maximum characters in output |
 | `QUERY_TIMEOUT` | No | 120 | Query timeout in seconds |
@@ -117,16 +119,9 @@ Access it all via SQL queries to MotherDuck.
 
 [FastMCP Cloud](https://fastmcp.cloud) autoscales and load balances traffic across multiple server instances based on demand. 
 
-[MotherDuck read scaling tokens](https://motherduck.com/docs/key-tasks/authenticating-and-connecting-to-motherduck/read-scaling/) provide multiple read-only replicas of your database for improved concurrent query performance.
+Each server instance picks a random session hint on startup for load distribution. With [MotherDuck read scaling tokens](https://motherduck.com/docs/key-tasks/authenticating-and-connecting-to-motherduck/read-scaling/), this enables concurrent queries across multiple read-only replicas for improved performance. With regular tokens, the session hint is a harmless no-op.
 
-With read-scaling enabled default, each server instance:
-- Picks a random session hint on startup
-- Connects to one MotherDuck read replica
-- Maintains that connection for its lifetime
-
-This distributes load across both FastMCP instances and MotherDuck read replicas for optimal performance.
-
-To disable read scaling and establish a connection with a regular MotherDuck token, set `USE_READ_SCALING=false`.
+This architecture distributes load across both FastMCP instances and (optionally) MotherDuck read replicas.
 
 ---
 

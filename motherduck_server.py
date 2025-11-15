@@ -1,8 +1,9 @@
 """
-FastMCP MotherDuck Server with Read Scaling
+FastMCP MotherDuck Server
 
 A high-performance MCP server for querying MotherDuck.
-Each instance connects to one random read replica.
+Each instance uses a random session hint for optimal load distribution.
+Supports both regular tokens and read scaling tokens.
 FastMCP Cloud handles horizontal scaling across instances.
 """
 
@@ -19,7 +20,6 @@ from fastmcp import FastMCP
 DATABASE_NAME = os.getenv("DATABASE_NAME", "antm_hack")
 DB_PATH = f"md:{DATABASE_NAME}"
 MOTHERDUCK_TOKEN = os.getenv("MOTHERDUCK_TOKEN")
-USE_READ_SCALING = os.getenv("USE_READ_SCALING", "true").lower() in ("true", "1", "yes")
 MAX_ROWS = int(os.getenv("MAX_ROWS", "1024"))
 MAX_CHARS = int(os.getenv("MAX_CHARS", "50000"))
 QUERY_TIMEOUT = int(os.getenv("QUERY_TIMEOUT", "120"))
@@ -47,13 +47,11 @@ def initialize_connection():
     if not MOTHERDUCK_TOKEN:
         raise ValueError("MOTHERDUCK_TOKEN environment variable is required")
     
-    # Build connection parameters (saas_mode and session_hint must be in path)
-    params = ["saas_mode=true"]
+    # Always use session_hint for load distribution (harmless no-op with regular tokens)
+    _replica_id = random.randint(1, 1000)
     
-    # Add session hint if read scaling is enabled
-    if USE_READ_SCALING:
-        _replica_id = random.randint(1, 1000)
-        params.append(f"session_hint={_replica_id}")
+    # Build connection parameters (saas_mode and session_hint must be in path)
+    params = ["saas_mode=true", f"session_hint={_replica_id}"]
     
     # Build connection string
     connection_path = f"{DB_PATH}?{'&'.join(params)}"
@@ -65,10 +63,7 @@ def initialize_connection():
         config={'motherduck_token': MOTHERDUCK_TOKEN}
     )
     
-    log_msg = "🦆 Connected to MotherDuck in SaaS mode"
-    if USE_READ_SCALING:
-        log_msg += f" with read scaling (session_hint={_replica_id})"
-    logger.info(log_msg)
+    logger.info(f"🦆 Connected to MotherDuck in SaaS mode (session_hint={_replica_id})")
 
 
 def execute_query(query: str, params: Optional[list] = None) -> str:
@@ -185,10 +180,7 @@ initialize_connection()
 logger.info("🚀 MotherDuck MCP Server ready!")
 logger.info(f"📊 Configuration:")
 logger.info(f"  • Database: {DATABASE_NAME}")
-logger.info(f"  • SaaS mode: Enabled")
-logger.info(f"  • Read scaling: {'Enabled' if USE_READ_SCALING else 'Disabled'}")
-if USE_READ_SCALING and _replica_id:
-    logger.info(f"  • Session hint: {_replica_id}")
+logger.info(f"  • Session hint: {_replica_id}")
 logger.info(f"  • Query timeout: {QUERY_TIMEOUT}s")
 logger.info(f"  • Max rows: {MAX_ROWS}")
 logger.info(f"  • Max chars: {MAX_CHARS:,}")
