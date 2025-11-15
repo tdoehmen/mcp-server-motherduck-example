@@ -8,7 +8,7 @@ This MCP server gives AI assistants (Claude, ChatGPT, etc.) direct access to the
 - **Show Tables Tool**: List all tables in the configured database  
 - **Get Guide Tool**: DuckDB SQL syntax reference and performance tips
 - Read Only: Connections established in [read-only mode](https://motherduck.com/docs/key-tasks/ai-and-motherduck/building-analytics-agents/#read-only-access) and in [SaaS mode](https://motherduck.com/docs/key-tasks/authenticating-and-connecting-to-motherduck/authenticating-to-motherduck/#authentication-using-saas-mode) to restrict local file/database access within the remote MCP server
-- Autoscaling: FastMCP Cloud with support for MotherDuck read scaling tokens (see [Autoscaling](#autoscaling))
+- Autoscaling: FastMCP Cloud and with MotherDuck read scaling tokens (see [Autoscaling](#autoscaling))
 - Query Timeout: 120 second timeout protection
 - Result Limits: Max 1024 rows, 50,000 characters
 
