@@ -10,9 +10,9 @@ import os
 import random
 import logging
 import threading
+import json
 from typing import Optional
 import duckdb
-from tabulate import tabulate
 from fastmcp import FastMCP
 
 # Configuration from environment variables
@@ -72,7 +72,7 @@ def initialize_connection():
 
 
 def execute_query(query: str, params: Optional[list] = None) -> str:
-    """Execute a query and return formatted results"""
+    """Execute a query and return results as JSON"""
     if not _conn:
         initialize_connection()
     
@@ -92,21 +92,29 @@ def execute_query(query: str, params: Optional[list] = None) -> str:
         # Fetch results
         rows = result.fetchmany(MAX_ROWS)
         has_more_rows = result.fetchone() is not None
-        headers = [d[0] + "\n" + str(d[1]) for d in result.description]
+        column_names = [d[0] for d in result.description]
         
-        # Format as table
-        output = tabulate(rows, headers=headers, tablefmt="pretty")
+        # Convert to list of dictionaries
+        data = [dict(zip(column_names, row)) for row in rows]
+        
+        # Build response object
+        response = {
+            "data": data,
+            "row_count": len(data),
+            "truncated": has_more_rows
+        }
+        
+        # Add truncation warning if needed
+        if has_more_rows:
+            response["warning"] = f"Results limited to {MAX_ROWS} rows"
+        
+        # Convert to JSON string
+        output = json.dumps(response, indent=2, default=str)
         
         # Apply character limit
-        char_truncated = len(output) > MAX_CHARS
-        if char_truncated:
+        if len(output) > MAX_CHARS:
             output = output[:MAX_CHARS]
-        
-        # Add warnings
-        if has_more_rows:
-            output += f"\n\n⚠️  Showing first {len(rows)} rows."
-        elif char_truncated:
-            output += f"\n\n⚠️  Output truncated at {MAX_CHARS:,} characters."
+            output += f'\n\n"warning": "Output truncated at {MAX_CHARS:,} characters"'
         
         return output
     
@@ -129,7 +137,7 @@ def query(query: str) -> str:
         query: SQL query to execute (DuckDB SQL dialect)
     
     Returns:
-        Formatted table with query results
+        JSON with query results (data, row_count, truncated)
     """
     return execute_query(query)
 
@@ -140,7 +148,7 @@ def show_tables() -> str:
     Show all tables in the database.
     
     Returns:
-        Formatted table with all tables in the configured database
+        JSON with all tables in the configured database
     """
     return execute_query(
         "SELECT * FROM duckdb_tables() WHERE database_name = ?",

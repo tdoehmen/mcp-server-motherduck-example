@@ -65,6 +65,8 @@ fastmcp run motherduck_server.py
 ### `query`
 Execute any SQL query on the dataset.
 
+**Returns:** JSON with `data` (array of row objects), `row_count`, and `truncated` flag.
+
 **Example:**
 ```sql
 SELECT * FROM customers LIMIT 10
@@ -72,6 +74,8 @@ SELECT * FROM customers LIMIT 10
 
 ### `show_tables`  
 List all tables in the database (uses configured `DATABASE_NAME`).
+
+**Returns:** JSON with table information.
 
 **No parameters needed.**
 
