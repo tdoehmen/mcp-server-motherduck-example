@@ -18,8 +18,7 @@ from fastmcp import FastMCP
 # Configuration from environment variables
 DB_PATH = os.getenv("DB_PATH", "md:antm_hack")
 MOTHERDUCK_TOKEN = os.getenv("MOTHERDUCK_TOKEN")
-READ_SCALING_REPLICAS = int(os.getenv("READ_SCALING_REPLICAS", "16"))
-SESSION_HINT_RANGE = int(os.getenv("SESSION_HINT_RANGE", "100"))
+USE_READ_SCALING = os.getenv("USE_READ_SCALING", "").lower() in ("true", "1", "yes")
 MAX_ROWS = int(os.getenv("MAX_ROWS", "1024"))
 MAX_CHARS = int(os.getenv("MAX_CHARS", "50000"))
 QUERY_TIMEOUT = int(os.getenv("QUERY_TIMEOUT", "120"))
@@ -37,25 +36,35 @@ _replica_id: Optional[int] = None
 
 
 def initialize_connection():
-    """Initialize connection to a random read replica"""
+    """Initialize connection to MotherDuck"""
     global _conn, _replica_id
     
     if _conn:
         return  # Already initialized
     
-    # Pick a random session hint (wider range than actual replicas for better distribution)
-    _replica_id = random.randint(1, SESSION_HINT_RANGE)
-    
-    # Build connection string with token and session hint
+    # Build connection string
     if MOTHERDUCK_TOKEN:
         separator = "&" if "?" in DB_PATH else "?"
-        connection_path = f"{DB_PATH}{separator}motherduck_token={MOTHERDUCK_TOKEN}&session_hint={_replica_id}"
+        connection_path = f"{DB_PATH}{separator}motherduck_token={MOTHERDUCK_TOKEN}"
     else:
-        separator = "&" if "?" in DB_PATH else "?"
-        connection_path = f"{DB_PATH}{separator}session_hint={_replica_id}"
+        connection_path = DB_PATH
+    
+    # Add session hint if read scaling is enabled
+    if USE_READ_SCALING:
+        _replica_id = random.randint(1, 1000)
+        separator = "&" if "?" in connection_path else "?"
+        connection_path = f"{connection_path}{separator}session_hint={_replica_id}"
+    
+    # Always use SaaS mode for security
+    separator = "&" if "?" in connection_path else "?"
+    connection_path = f"{connection_path}{separator}saas_mode=true"
     
     _conn = duckdb.connect(connection_path, read_only=True)
-    logger.info(f"🦆 Connected to MotherDuck with session_hint={_replica_id} ({READ_SCALING_REPLICAS} replicas available)")
+    
+    log_msg = "🦆 Connected to MotherDuck in SaaS mode"
+    if USE_READ_SCALING:
+        log_msg += f" with read scaling (session_hint={_replica_id})"
+    logger.info(log_msg)
 
 
 def execute_query(query: str, params: Optional[list] = None) -> str:
@@ -167,8 +176,10 @@ initialize_connection()
 logger.info("🚀 MotherDuck MCP Server ready!")
 logger.info(f"📊 Configuration:")
 logger.info(f"  • Database: {DB_PATH}")
-logger.info(f"  • Read replicas: {READ_SCALING_REPLICAS}")
-logger.info(f"  • Session hint: {_replica_id} (range: 1-{SESSION_HINT_RANGE})")
+logger.info(f"  • SaaS mode: Enabled")
+logger.info(f"  • Read scaling: {'Enabled' if USE_READ_SCALING else 'Disabled'}")
+if USE_READ_SCALING and _replica_id:
+    logger.info(f"  • Session hint: {_replica_id}")
 logger.info(f"  • Query timeout: {QUERY_TIMEOUT}s")
 logger.info(f"  • Max rows: {MAX_ROWS}")
 logger.info(f"  • Max chars: {MAX_CHARS:,}")
