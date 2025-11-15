@@ -1,4 +1,4 @@
-# MotherDuck MCP Server for ANTM Hackathon
+# MotherDuck MCP Server on FastMCP Cloud
 
 FastMCP server for querying the ANTM hackathon dataset in MotherDuck with read scaling support.
 
