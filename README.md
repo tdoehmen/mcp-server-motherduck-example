@@ -24,30 +24,30 @@ For easy setup in **OpenAI SDK**, **Codex CLI**, **Claude Desktop**, **Claude Co
 
 ### Deploy Your Own Instance
 
-1. **Create a [MotherDuck account](https://app.motherduck.com/)**
+1. Create a [MotherDuck account](https://app.motherduck.com/)
 
-2. **Create a [MotherDuck token](https://motherduck.com/docs/key-tasks/authenticating-and-connecting-to-motherduck/authenticating-to-motherduck/#creating-an-access-token)**
+2. Create a [MotherDuck token](https://motherduck.com/docs/key-tasks/authenticating-and-connecting-to-motherduck/authenticating-to-motherduck/#creating-an-access-token)
 
-3. **Load data into MotherDuck** (choose one):
+3. Load data into MotherDuck (choose one):
    - Run `load_data.py` script to upload parquet files from `data/` directory
    - Or attach the [shared database](https://motherduck.com/docs/key-tasks/sharing-data/sharing-overview/#consuming-hidden-shares), by running: `ATTACH 'md:_share/antm_hack/88329567-1b97-4593-9696-73fd2be9c63d'`
 
-4. **Fork this repo** (if not already done)
+4. Fork this repo (if not already done)
 
-5. **Go to [FastMCP Cloud](https://fastmcp.cloud)**
+5. Go to [FastMCP Cloud](https://fastmcp.cloud)
 
-6. **Connect your repository**
+6. Connect your repository
 
-7. **Set environment variable**:
+7. Set environment variable:
    ```
-   MOTHERDUCK_TOKEN=<your_token>
+   MOTHERDUCK_TOKEN=<your_read_write_or_read_scaling_token>
    ```
 
-8. **Configure deployment settings**:
+8. Configure deployment settings:
    - **Entrypoint:** `motherduck_server.py`
    - **Requirements File:** `requirements.txt`
 
-9. **Deploy!**
+9. Deploy!
 
 ### Test Locally
 
