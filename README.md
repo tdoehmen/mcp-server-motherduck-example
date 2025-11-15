@@ -68,7 +68,7 @@ fastmcp run motherduck_server.py
 
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
-| `MOTHERDUCK_TOKEN` | ✅ Yes | - | Your MotherDuck token (regular or read scaling) |
+| `MOTHERDUCK_TOKEN` | Yes | - | Your MotherDuck token (regular or read scaling) |
 | `DATABASE_NAME` | No | antm_hack | Name of the MotherDuck database to connect to |
 | `MAX_ROWS` | No | 1024 | Maximum rows in query results |
 | `MAX_CHARS` | No | 50000 | Maximum characters in output |
