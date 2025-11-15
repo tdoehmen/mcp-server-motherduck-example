@@ -4,19 +4,19 @@ This MCP server gives AI assistants (Claude, ChatGPT, etc.) direct access to the
 
 ## Features
 
-- **Query Tool**: Execute SQL queries on the hackathon dataset
-- **Show Tables Tool**: List all tables in the configured database  
-- **Get Guide Tool**: DuckDB SQL syntax reference and performance tips
-- **Read Only**: Connections established in [read-only mode](https://motherduck.com/docs/key-tasks/ai-and-motherduck/building-analytics-agents/#read-only-access) and in [SaaS mode](https://motherduck.com/docs/key-tasks/authenticating-and-connecting-to-motherduck/authenticating-to-motherduck/#authentication-using-saas-mode) to restrict local file/database access within the remote MCP server
-- **Autoscaling**: FastMCP Cloud with support for MotherDuck read scaling tokens (see [Autoscaling](#autoscaling))
-- **Query Timeout**: 120 second timeout protection
-- **Result Limits**: Max 1024 rows, 50,000 characters
+- Query Tool: Execute SQL queries on the hackathon dataset
+- Show Tables Tool: List all tables in the configured database  
+- Get Guide Tool: DuckDB SQL syntax reference and performance tips
+- Read Only: Connections established in [read-only mode](https://motherduck.com/docs/key-tasks/ai-and-motherduck/building-analytics-agents/#read-only-access) and in [SaaS mode](https://motherduck.com/docs/key-tasks/authenticating-and-connecting-to-motherduck/authenticating-to-motherduck/#authentication-using-saas-mode) to restrict local file/database access within the remote MCP server
+- Autoscaling: FastMCP Cloud with support for MotherDuck read scaling tokens (see [Autoscaling](#autoscaling))
+- Query Timeout: 120 second timeout protection
+- Result Limits: Max 1024 rows, 50,000 characters
 
 ## Quick Start
 
 ### Use the Deployed Server
 
-**MCP URL:** `https://antm-hack-example.fastmcp.app/mcp`
+MCP URL: `https://antm-hack-example.fastmcp.app/mcp`
 
 For easy setup in **OpenAI SDK**, **Codex CLI**, **Claude Desktop**, **Claude Code**, **Cursor**, or **Gemini CLI**, go to:
 
@@ -44,8 +44,8 @@ For easy setup in **OpenAI SDK**, **Codex CLI**, **Claude Desktop**, **Claude Co
    ```
 
 8. Configure deployment settings:
-   - **Entrypoint:** `motherduck_server.py`
-   - **Requirements File:** `requirements.txt`
+   - Entrypoint: `motherduck_server.py`
+   - Requirements File: `requirements.txt`
 
 9. Deploy!
 
