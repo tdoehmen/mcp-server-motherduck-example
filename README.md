@@ -7,10 +7,10 @@ This MCP server gives AI assistants (Claude, ChatGPT, etc.) direct access to the
 - **Query Tool**: Execute SQL queries on the hackathon dataset
 - **Show Tables Tool**: List all tables in the configured database  
 - **Get Guide Tool**: DuckDB SQL syntax reference and performance tips
-- Read Only: Connections established in [read-only mode](https://motherduck.com/docs/key-tasks/ai-and-motherduck/building-analytics-agents/#read-only-access) and in [SaaS mode](https://motherduck.com/docs/key-tasks/authenticating-and-connecting-to-motherduck/authenticating-to-motherduck/#authentication-using-saas-mode) to restrict local file/database access within the remote MCP server
-- Autoscaling: FastMCP Cloud and with MotherDuck read scaling tokens (see [Autoscaling](#autoscaling))
+- Read Only: Connecting as [read-only](https://motherduck.com/docs/key-tasks/ai-and-motherduck/building-analytics-agents/#read-only-access), and in [SaaS mode](https://motherduck.com/docs/key-tasks/authenticating-and-connecting-to-motherduck/authenticating-to-motherduck/#authentication-using-saas-mode) to restrict local file access for the remote MCP server
 - Query Timeout: 120 second timeout protection
 - Result Limits: Max 1024 rows, 50,000 characters
+- Autoscaling: see [autoscaling](#Autoscaling) section
 
 ## Quick Start
 
@@ -62,8 +62,6 @@ export MOTHERDUCK_TOKEN="your_token_here"
 fastmcp run motherduck_server.py
 ```
 
----
-
 ## Environment Variables
 
 | Variable | Required | Default | Description |
@@ -74,14 +72,12 @@ fastmcp run motherduck_server.py
 | `MAX_CHARS` | No | 50000 | Maximum characters in output |
 | `QUERY_TIMEOUT` | No | 120 | Query timeout in seconds |
 
----
-
 ## Available Tools
 
 ### `query`
 Execute any SQL query on the dataset.
 
-**Returns:** JSON with `data` (array of row objects), `row_count`, and `truncated` flag.
+Returns: JSON with `data` (array of row objects), `row_count`, and `truncated` flag.
 
 **Example:**
 ```sql
@@ -91,25 +87,12 @@ SELECT * FROM customers LIMIT 10
 ### `show_tables`  
 List all tables in the database (uses configured `DATABASE_NAME`).
 
-**Returns:** JSON with table information.
+Returns: JSON with table information.
 
 **No parameters needed.**
 
 ### `get_guide`
 Get DuckDB SQL syntax guide.
-
----
-
-## The Dataset
-
-The hackathon includes:
-- **24 Parquet tables**: Structured retail data
-- **19 JSONL log files**: Event streams  
-- **Multiple PDFs**: Contracts, invoices, policies
-
-Access it all via SQL queries to MotherDuck.
-
----
 
 ## Autoscaling
 
@@ -118,33 +101,3 @@ Access it all via SQL queries to MotherDuck.
 Each server instance picks a random session hint on startup for load distribution. With [MotherDuck read scaling tokens](https://motherduck.com/docs/key-tasks/authenticating-and-connecting-to-motherduck/read-scaling/), this enables concurrent queries across multiple read-only replicas for improved performance. With regular tokens, the session hint is a harmless no-op.
 
 This architecture distributes load across both FastMCP instances and (optionally) MotherDuck read replicas.
-
----
-
-## Links
-
-- **Hackathon**: [github.com/TheoryVentures/antm](https://github.com/TheoryVentures/antm)
-- **Competition Platform**: [hack.theoryvc.com](https://hack.theoryvc.com)
-- **FastMCP**: [gofastmcp.com](https://gofastmcp.com/getting-started/welcome)
-- **FastMCP Cloud**: [fastmcp.cloud](https://fastmcp.cloud)
-- **MotherDuck**: [motherduck.com](https://motherduck.com)
-
----
-
-## Files
-
-```
-.
-├── motherduck_server.py    # Main FastMCP server
-├── query_guide.md          # DuckDB SQL reference
-├── requirements.txt        # Dependencies
-└── README.md              # This file
-```
-
----
-
-**Built for [America's Next Top Modeler](https://github.com/TheoryVentures/antm) Hackathon**
-
----
-
-_MIT License_
