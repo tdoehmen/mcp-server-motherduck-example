@@ -16,8 +16,6 @@ This MCP server gives AI assistants (Claude, ChatGPT, etc.) direct access to the
 
 ### Use the Deployed Server
 
-MCP URL: `https://antm-hack-example.fastmcp.app/mcp`
-
 For easy setup in **OpenAI SDK**, **Codex CLI**, **Claude Desktop**, **Claude Code**, **Cursor**, or **Gemini CLI**, go to:
 
 👉 **[fastmcp.cloud/app/antm-hack-example](https://fastmcp.cloud/app/antm-hack-example)**
