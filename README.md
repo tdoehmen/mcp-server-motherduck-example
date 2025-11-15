@@ -1,10 +1,11 @@
 # MotherDuck MCP Server for ANTM Hackathon
 
-FastMCP server for querying the ANTM hackathon dataset in MotherDuck with read scaling support.
+This MCP server gives AI assistants (Claude, ChatGPT, etc.) direct access to the [America's Next Top Modeler](https://github.com/TheoryVentures/antm) hackathon dataset via a remote [MotherDuck](https://motherduck.com) MCP server, hosted on [FastMCP Cloud](https://fastmcp.cloud).
 
-## What is This?
+**MCP Server URL:** `https://antm-hack-example.fastmcp.app/mcp`  
+**Competition Platform:** [hack.theoryvc.com](https://hack.theoryvc.com)
 
-This MCP server gives AI assistants (Claude, ChatGPT, etc.) direct access to the [America's Next Top Modeler](https://github.com/TheoryVentures/antm) hackathon dataset via a remote MotherDuck MCP server, hosted on FastMCP Cloud.
+---
 
 ## Features
 
@@ -16,9 +17,22 @@ This MCP server gives AI assistants (Claude, ChatGPT, etc.) direct access to the
 - **Query Timeout**: 120 second timeout protection
 - **Result Limits**: Max 1024 rows, 50,000 characters
 
+---
+
 ## Quick Start
 
-### Deploy to FastMCP Cloud
+### Use the Deployed Server
+
+To connect Claude to the deployed MCP server:
+
+1. Open **Claude Desktop** or **Claude.ai**
+2. Go to **Settings → Connectors → Add custom connector**
+3. Configure:
+   - **Name:** `ANTM Hack MotherDuck`
+   - **URL:** `https://antm-hack-example.fastmcp.app/mcp`
+4. Start querying the hackathon dataset!
+
+### Deploy Your Own Instance
 
 1. **Push to GitHub** (if not already done)
 
@@ -49,6 +63,8 @@ export MOTHERDUCK_TOKEN="your_read_scaling_token_here"
 fastmcp run motherduck_server.py
 ```
 
+---
+
 ## Environment Variables
 
 | Variable | Required | Default | Description |
@@ -59,6 +75,8 @@ fastmcp run motherduck_server.py
 | `MAX_ROWS` | No | 1024 | Maximum rows in query results |
 | `MAX_CHARS` | No | 50000 | Maximum characters in output |
 | `QUERY_TIMEOUT` | No | 120 | Query timeout in seconds |
+
+---
 
 ## Available Tools
 
@@ -82,6 +100,8 @@ List all tables in the database (uses configured `DATABASE_NAME`).
 ### `get_guide`
 Get DuckDB SQL syntax guide.
 
+---
+
 ## The Dataset
 
 The hackathon includes:
@@ -90,6 +110,8 @@ The hackathon includes:
 - **Multiple PDFs**: Contracts, invoices, policies
 
 Access it all via SQL queries to MotherDuck.
+
+---
 
 ## Autoscaling
 
@@ -104,7 +126,9 @@ With read-scaling enabled default, each server instance:
 
 This distributes load across both FastMCP instances and MotherDuck read replicas for optimal performance.
 
-To disable read scaling and establish a connection with a regular MotherDuck token, set `USE_READ_SCALING=false`. 
+To disable read scaling and establish a connection with a regular MotherDuck token, set `USE_READ_SCALING=false`.
+
+---
 
 ## Links
 
@@ -113,6 +137,8 @@ To disable read scaling and establish a connection with a regular MotherDuck tok
 - **FastMCP**: [gofastmcp.com](https://gofastmcp.com/getting-started/welcome)
 - **FastMCP Cloud**: [fastmcp.cloud](https://fastmcp.cloud)
 - **MotherDuck**: [motherduck.com](https://motherduck.com)
+
+---
 
 ## Files
 
@@ -124,10 +150,10 @@ To disable read scaling and establish a connection with a regular MotherDuck tok
 └── README.md              # This file
 ```
 
-## License
+---
 
-MIT License
+**Built for [America's Next Top Modeler](https://github.com/TheoryVentures/antm) Hackathon**
 
 ---
 
-Built for [America's Next Top Modeler](https://github.com/TheoryVentures/antm) Hackathon by [Theory Ventures](https://theory.vc)
+_MIT License_
