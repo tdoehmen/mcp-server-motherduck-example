@@ -180,15 +180,18 @@ def get_guide() -> str:
         return f"❌ Error reading guide: {str(e)}"
 
 
-# Initialize connection on module load
-initialize_connection()
-logger.info("🚀 MotherDuck MCP Server ready!")
-logger.info(f"📊 Configuration:")
-logger.info(f"  • Database: {DATABASE_NAME}")
-logger.info(f"  • SaaS mode: Enabled")
-logger.info(f"  • Read scaling: {'Enabled' if USE_READ_SCALING else 'Disabled'}")
-if USE_READ_SCALING and _replica_id:
-    logger.info(f"  • Session hint: {_replica_id}")
-logger.info(f"  • Query timeout: {QUERY_TIMEOUT}s")
-logger.info(f"  • Max rows: {MAX_ROWS}")
-logger.info(f"  • Max chars: {MAX_CHARS:,}")
+def create_server() -> FastMCP:
+    """Create the server"""
+    initialize_connection()
+    logger.info("🚀 MotherDuck MCP Server ready!")
+    logger.info(f"📊 Configuration:")
+    logger.info(f"  • Database: {DATABASE_NAME}")
+    logger.info(f"  • SaaS mode: Enabled")
+    logger.info(f"  • Read scaling: {'Enabled' if USE_READ_SCALING else 'Disabled'}")
+    if USE_READ_SCALING and _replica_id:
+        logger.info(f"  • Session hint: {_replica_id}")
+    logger.info(f"  • Query timeout: {QUERY_TIMEOUT}s")
+    logger.info(f"  • Max rows: {MAX_ROWS}")
+    logger.info(f"  • Max chars: {MAX_CHARS:,}")
+
+    return mcp
