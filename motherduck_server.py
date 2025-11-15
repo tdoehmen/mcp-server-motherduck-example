@@ -16,9 +16,10 @@ from tabulate import tabulate
 from fastmcp import FastMCP
 
 # Configuration from environment variables
-DB_PATH = os.getenv("DB_PATH", "md:antm_hack")
+DATABASE_NAME = os.getenv("DATABASE_NAME", "antm_hack")
+DB_PATH = f"md:{DATABASE_NAME}"
 MOTHERDUCK_TOKEN = os.getenv("MOTHERDUCK_TOKEN")
-USE_READ_SCALING = os.getenv("USE_READ_SCALING", "").lower() in ("true", "1", "yes")
+USE_READ_SCALING = os.getenv("USE_READ_SCALING", "true").lower() in ("true", "1", "yes")
 MAX_ROWS = int(os.getenv("MAX_ROWS", "1024"))
 MAX_CHARS = int(os.getenv("MAX_CHARS", "50000"))
 QUERY_TIMEOUT = int(os.getenv("QUERY_TIMEOUT", "120"))
@@ -42,24 +43,27 @@ def initialize_connection():
     if _conn:
         return  # Already initialized
     
-    # Build connection string
-    if MOTHERDUCK_TOKEN:
-        separator = "&" if "?" in DB_PATH else "?"
-        connection_path = f"{DB_PATH}{separator}motherduck_token={MOTHERDUCK_TOKEN}"
-    else:
-        connection_path = DB_PATH
+    # Require MotherDuck token
+    if not MOTHERDUCK_TOKEN:
+        raise ValueError("MOTHERDUCK_TOKEN environment variable is required")
+    
+    # Build connection parameters (saas_mode and session_hint must be in path)
+    params = ["saas_mode=true"]
     
     # Add session hint if read scaling is enabled
     if USE_READ_SCALING:
         _replica_id = random.randint(1, 1000)
-        separator = "&" if "?" in connection_path else "?"
-        connection_path = f"{connection_path}{separator}session_hint={_replica_id}"
+        params.append(f"session_hint={_replica_id}")
     
-    # Always use SaaS mode for security
-    separator = "&" if "?" in connection_path else "?"
-    connection_path = f"{connection_path}{separator}saas_mode=true"
+    # Build connection string
+    connection_path = f"{DB_PATH}?{'&'.join(params)}"
     
-    _conn = duckdb.connect(connection_path, read_only=True)
+    # Connect with token in config
+    _conn = duckdb.connect(
+        connection_path,
+        read_only=True,
+        config={'motherduck_token': MOTHERDUCK_TOKEN}
+    )
     
     log_msg = "🦆 Connected to MotherDuck in SaaS mode"
     if USE_READ_SCALING:
@@ -131,19 +135,16 @@ def query(query: str) -> str:
 
 
 @mcp.tool()
-def show_tables(database_name: str) -> str:
+def show_tables() -> str:
     """
-    Show all tables in a specific database.
-    
-    Args:
-        database_name: Name of the database to list tables from
+    Show all tables in the database.
     
     Returns:
-        Formatted table with database tables
+        Formatted table with all tables in the configured database
     """
     return execute_query(
         "SELECT * FROM duckdb_tables() WHERE database_name = ?",
-        [database_name]
+        [DATABASE_NAME]
     )
 
 
@@ -175,7 +176,7 @@ def get_guide() -> str:
 initialize_connection()
 logger.info("🚀 MotherDuck MCP Server ready!")
 logger.info(f"📊 Configuration:")
-logger.info(f"  • Database: {DB_PATH}")
+logger.info(f"  • Database: {DATABASE_NAME}")
 logger.info(f"  • SaaS mode: Enabled")
 logger.info(f"  • Read scaling: {'Enabled' if USE_READ_SCALING else 'Disabled'}")
 if USE_READ_SCALING and _replica_id:

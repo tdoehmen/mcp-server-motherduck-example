@@ -4,15 +4,15 @@ FastMCP server for querying the ANTM hackathon dataset in MotherDuck with read s
 
 ## What is This?
 
-This MCP server gives AI assistants (Claude, ChatGPT, etc.) direct access to the [America's Next Top Modeler](https://github.com/TheoryVentures/antm) hackathon dataset via SQL queries. The data is hosted in MotherDuck's `antm_hack` database.
+This MCP server gives AI assistants (Claude, ChatGPT, etc.) direct access to the [America's Next Top Modeler](https://github.com/TheoryVentures/antm) hackathon dataset via a remote MotherDuck MCP server, hosted on FastMCP Cloud.
 
 ## Features
 
 - **Query Tool**: Execute SQL queries on the hackathon dataset
-- **Show Tables Tool**: List all tables in the database  
+- **Show Tables Tool**: List all tables in the configured database  
 - **Get Guide Tool**: DuckDB SQL syntax reference and performance tips
-- **SaaS Mode**: Enhanced security (read-only, restricted file/database access)
-- **Read Scaling**: Horizontal scaling with connection pooling
+- **Read Only**: Connections established in [read-only mode](https://motherduck.com/docs/key-tasks/ai-and-motherduck/building-analytics-agents/#read-only-access) and in [SaaS mode](https://motherduck.com/docs/key-tasks/authenticating-and-connecting-to-motherduck/authenticating-to-motherduck/#authentication-using-saas-mode) to restrict local file/database access within the remote MCP server
+- **Autoscaling**: FastMCP Cloud and MotherDuck read scaling (see [Autoscaling](#autoscaling) section)
 - **Query Timeout**: 120 second timeout protection
 - **Result Limits**: Max 1024 rows, 50,000 characters
 
@@ -30,6 +30,7 @@ This MCP server gives AI assistants (Claude, ChatGPT, etc.) direct access to the
    ```
    MOTHERDUCK_TOKEN=<your_read_scaling_token>
    ```
+   (Read scaling is enabled by default)
 
 5. **Deploy!**
 
@@ -41,11 +42,10 @@ This MCP server gives AI assistants (Claude, ChatGPT, etc.) direct access to the
 # Install dependencies
 pip install -r requirements.txt
 
-# Set environment variables
-export MOTHERDUCK_TOKEN="your_token_here"
-export USE_READ_SCALING=true
+# Set environment variable
+export MOTHERDUCK_TOKEN="your_read_scaling_token_here"
 
-# Run the server
+# Run the server (read scaling enabled by default)
 fastmcp run motherduck_server.py
 ```
 
@@ -53,8 +53,9 @@ fastmcp run motherduck_server.py
 
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
-| `MOTHERDUCK_TOKEN` | ✅ Yes | - | Your MotherDuck token (regular or read scaling) |
-| `USE_READ_SCALING` | No | false | Enable read scaling with session hints |
+| `MOTHERDUCK_TOKEN` | ✅ Yes | - | Your MotherDuck token (use read scaling token) |
+| `DATABASE_NAME` | No | antm_hack | Name of the MotherDuck database to connect to |
+| `USE_READ_SCALING` | No | true | Set to `false` to disable read scaling and use regular MotherDuck token |
 | `MAX_ROWS` | No | 1024 | Maximum rows in query results |
 | `MAX_CHARS` | No | 50000 | Maximum characters in output |
 | `QUERY_TIMEOUT` | No | 120 | Query timeout in seconds |
@@ -70,15 +71,12 @@ SELECT * FROM customers LIMIT 10
 ```
 
 ### `show_tables`  
-List all tables in a specific database.
+List all tables in the database (uses configured `DATABASE_NAME`).
 
-**Example:**
-```python
-show_tables("antm_hack")
-```
+**No parameters needed.**
 
 ### `get_guide`
-Get DuckDB SQL syntax and performance guide.
+Get DuckDB SQL syntax guide.
 
 ## The Dataset
 
@@ -89,17 +87,20 @@ The hackathon includes:
 
 Access it all via SQL queries to MotherDuck.
 
-## Scaling Architecture
+## Autoscaling
 
 [FastMCP Cloud](https://fastmcp.cloud) autoscales and load balances traffic across multiple server instances based on demand. 
 
-MotherDuck [read scaling tokens](https://motherduck.com/docs/key-tasks/authenticating-and-connecting-to-motherduck/read-scaling/) provide multiple read-only replicas of your database for improved concurrent query performance.
+[MotherDuck read scaling tokens](https://motherduck.com/docs/key-tasks/authenticating-and-connecting-to-motherduck/read-scaling/) provide multiple read-only replicas of your database for improved concurrent query performance.
 
-When `USE_READ_SCALING=true`, each server instance:
+With read-scaling enabled default, each server instance:
+- Picks a random session hint on startup
 - Connects to one MotherDuck read replica
 - Maintains that connection for its lifetime
 
-This distributes load across both FastMCP instances and MotherDuck read replicas for optimal performance. 
+This distributes load across both FastMCP instances and MotherDuck read replicas for optimal performance.
+
+To disable read scaling and establish a connection with a regular MotherDuck token, set `USE_READ_SCALING=false`. 
 
 ## Links
 
